@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS MAP - Acadêmico</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 560px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #22543d; }
+        label { display: block; margin-top: 0.75rem; }
+        input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+        button { margin-top: 1rem; margin-right: 0.5rem; padding: 0.6rem 1rem; cursor: pointer; }
+        pre { background: #f4f4f5; padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
+        .hint { font-size: 0.9rem; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>Microsserviço Acadêmico</h1>
+    <p class="hint">View MVC — faça login em <a href="http://localhost:8081">:8081</a> e cole o JWT abaixo.</p>
+
+    <label>JWT (Bearer)
+        <input id="jwt" placeholder="cole o token aqui">
+    </label>
+
+    <h2>Cursos</h2>
+    <button onclick="listarCursos()">GET /cursos</button>
+
+    <h2>Matrícula</h2>
+    <label>ID do curso <input id="idCurso" type="number" value="1"></label>
+    <button onclick="matricular()">POST /matriculas</button>
+    <button onclick="listarMatriculas()">GET /matriculas</button>
+
+    <h3>Resposta</h3>
+    <pre id="saida">Aguardando ação...</pre>
+
+    <script>
+        const AUTH_URL = 'http://localhost:8081';
+
+        function headersComJwt() {
+            let token = document.getElementById('jwt').value.trim();
+            if (!token) token = localStorage.getItem('jwt') || '';
+            if (!token) throw new Error('Informe o JWT (login no serviço de autenticação)');
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+        }
+
+        async function listarCursos() {
+            const res = await fetch('/cursos');
+            document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+        }
+
+        async function matricular() {
+            try {
+                const res = await fetch('/matriculas', {
+                    method: 'POST',
+                    headers: headersComJwt(),
+                    body: JSON.stringify({ idCurso: Number(document.getElementById('idCurso').value) })
+                });
+                document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+            } catch (e) {
+                document.getElementById('saida').textContent = e.message;
+            }
+        }
+
+        async function listarMatriculas() {
+            try {
+                const res = await fetch('/matriculas', { headers: headersComJwt() });
+                document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+            } catch (e) {
+                document.getElementById('saida').textContent = e.message;
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('jwt');
+            if (saved) document.getElementById('jwt').value = saved;
+        });
+    </script>
+</body>
+</html>

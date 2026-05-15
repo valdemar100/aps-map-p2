@@ -1,0 +1,74 @@
+APS MAP P2 - Sistema Acadêmico com Microserviços
+================================================
+
+Estrutura:
+  microservico-autenticacao/  -> porta 8081
+  microservico-academico/     -> porta 8082
+
+Requisitos: Java 17, Maven 3.9+ (ou Docker)
+
+EXECUTAR COM MAVEN (dois terminais)
+---------------------------------
+Terminal 1:
+  cd microservico-autenticacao
+  mvn spring-boot:run
+
+Terminal 2:
+  cd microservico-academico
+  mvn spring-boot:run
+
+EXECUTAR COM DOCKER
+-------------------
+  docker compose up --build
+
+INTERFACES (View MVC)
+---------------------
+  http://localhost:8081/   -> login e cadastro
+  http://localhost:8082/   -> cursos e matrículas
+
+USUÁRIOS DE TESTE (criados automaticamente)
+-------------------------------------------
+  aluno1 / aluno123
+  admin  / admin123
+
+FLUXO POSTMAN
+-------------
+1. POST http://localhost:8081/login
+   Body JSON: {"login":"aluno1","senha":"aluno123"}
+   -> copiar o "token" da resposta
+
+2. GET http://localhost:8082/cursos
+
+3. POST http://localhost:8082/matriculas
+   Header: Authorization: Bearer SEU_TOKEN
+   Body JSON: {"idCurso":1}
+
+4. GET http://localhost:8082/matriculas
+   Header: Authorization: Bearer SEU_TOKEN
+
+5. GET http://localhost:8081/usuarios/1
+   (chamada interna feita pelo microsserviço acadêmico via UsuarioClient)
+
+ENDPOINTS AUTENTICAÇÃO (8081)
+-----------------------------
+  POST /login
+  POST /cadastro
+  GET  /usuarios/{id}
+
+ENDPOINTS ACADÊMICO (8082)
+--------------------------
+  GET    /cursos
+  GET    /cursos/{id}
+  POST   /cursos
+  PUT    /cursos/{id}
+  DELETE /cursos/{id}
+  POST   /matriculas      (requer JWT)
+  GET    /matriculas      (requer JWT)
+
+PADRÕES GRASP (para o relatório)
+--------------------------------
+  Controller   -> AutenticacaoController, CursoController, MatriculaController
+  Expert       -> UsuarioService, TokenService, MatriculaService, CursoService
+  Creator      -> MatriculaService.criarMatricula + MatriculaRepository.save
+  Alta coesão  -> TokenService só JWT; UsuarioClient só HTTP
+  Baixo acopl. -> Acadêmico não importa entidade Usuario; usa REST + DTO

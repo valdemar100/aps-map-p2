@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "APS MAP P2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "authUrl", "value": "http://localhost:8081" },
+    { "key": "academicUrl", "value": "http://localhost:8082" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"aluno1\",\n  \"senha\": \"aluno123\"\n}"
+        },
+        "url": "{{authUrl}}/login"
+      }
+    },
+    {
+      "name": "Cadastro",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"novoaluno\",\n  \"senha\": \"senha123\",\n  \"nome\": \"Maria Souza\"\n}"
+        },
+        "url": "{{authUrl}}/cadastro"
+      }
+    },
+    {
+      "name": "Buscar usuário",
+      "request": {
+        "method": "GET",
+        "url": "{{authUrl}}/usuarios/1"
+      }
+    },
+    {
+      "name": "Listar cursos",
+      "request": {
+        "method": "GET",
+        "url": "{{academicUrl}}/cursos"
+      }
+    },
+    {
+      "name": "Cadastrar curso",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Redes de Computadores\",\n  \"cargaHoraria\": 60\n}"
+        },
+        "url": "{{academicUrl}}/cursos"
+      }
+    },
+    {
+      "name": "Realizar matrícula",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"idCurso\": 1\n}"
+        },
+        "url": "{{academicUrl}}/matriculas"
+      }
+    },
+    {
+      "name": "Listar minhas matrículas",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{academicUrl}}/matriculas"
+      }
+    }
+  ]
+}

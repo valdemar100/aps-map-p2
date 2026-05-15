@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS MAP - Autenticação</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 480px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { color: #1a365d; }
+        label { display: block; margin-top: 0.75rem; }
+        input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+        button { margin-top: 1rem; padding: 0.6rem 1.2rem; cursor: pointer; }
+        pre { background: #f4f4f5; padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
+        .tabs button { margin-right: 0.5rem; }
+        .tab { display: none; }
+        .tab.active { display: block; }
+    </style>
+</head>
+<body>
+    <h1>Microsserviço de Autenticação</h1>
+    <p>View MVC — interface HTML para testes da API REST.</p>
+
+    <div class="tabs">
+        <button type="button" onclick="showTab('login')">Login</button>
+        <button type="button" onclick="showTab('cadastro')">Cadastro</button>
+    </div>
+
+    <section id="login" class="tab active">
+        <h2>Login</h2>
+        <label>Login <input id="loginUser" value="aluno1"></label>
+        <label>Senha <input id="loginPass" type="password" value="aluno123"></label>
+        <button onclick="fazerLogin()">Entrar</button>
+    </section>
+
+    <section id="cadastro" class="tab">
+        <h2>Cadastro</h2>
+        <label>Login <input id="cadLogin"></label>
+        <label>Nome <input id="cadNome"></label>
+        <label>Senha <input id="cadSenha" type="password"></label>
+        <button onclick="fazerCadastro()">Cadastrar</button>
+    </section>
+
+    <h3>Resposta</h3>
+    <pre id="saida">Aguardando ação...</pre>
+
+    <script>
+        function showTab(id) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+        async function fazerLogin() {
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    login: document.getElementById('loginUser').value,
+                    senha: document.getElementById('loginPass').value
+                })
+            });
+            const text = await res.text();
+            document.getElementById('saida').textContent = res.status + '\n' + text;
+            if (res.ok) localStorage.setItem('jwt', JSON.parse(text).token);
+        }
+        async function fazerCadastro() {
+            const res = await fetch('/cadastro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    login: document.getElementById('cadLogin').value,
+                    nome: document.getElementById('cadNome').value,
+                    senha: document.getElementById('cadSenha').value
+                })
+            });
+            document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+        }
+    </script>
+</body>
+</html>
