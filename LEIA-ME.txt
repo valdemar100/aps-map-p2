@@ -23,8 +23,11 @@ EXECUTAR COM DOCKER
 
 INTERFACES (View MVC)
 ---------------------
-  http://localhost:8081/   -> login e cadastro
-  http://localhost:8082/   -> cursos e matrículas
+  http://127.0.0.1:8081/   -> login e cadastro
+  http://127.0.0.1:8082/   -> cursos e matrículas
+
+  IMPORTANTE (Windows + Docker): use 127.0.0.1 em vez de localhost.
+  Se usar "localhost", o navegador pode ficar carregando sem abrir.
 
 USUÁRIOS DE TESTE (criados automaticamente)
 -------------------------------------------

@@ -3,77 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APS MAP - Acadêmico</title>
+    <title>EduConnect — Portal Acadêmico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: system-ui, sans-serif; max-width: 560px; margin: 2rem auto; padding: 0 1rem; }
-        h1 { color: #22543d; }
-        label { display: block; margin-top: 0.75rem; }
-        input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-        button { margin-top: 1rem; margin-right: 0.5rem; padding: 0.6rem 1rem; cursor: pointer; }
-        pre { background: #f4f4f5; padding: 1rem; overflow-x: auto; font-size: 0.85rem; }
-        .hint { font-size: 0.9rem; color: #555; }
+        :root {
+            --bg: #0c1220;
+            --surface: #151d2e;
+            --surface-2: #1c2738;
+            --border: #2a3548;
+            --text: #eef2f7;
+            --muted: #8896a8;
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --accent: #6366f1;
+            --error: #f43f5e;
+            --warn: #f59e0b;
+            --radius: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse 70% 50% at 0% 0%, rgba(16,185,129,.12), transparent);
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .brand { display: flex; align-items: center; gap: .75rem; }
+        .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .brand h1 { font-size: 1.15rem; }
+        .brand span { font-size: .75rem; color: var(--muted); display: block; }
+        .user-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .user-chip {
+            padding: .4rem .85rem;
+            background: var(--surface-2);
+            border-radius: 999px;
+            font-size: .85rem;
+            border: 1px solid var(--border);
+        }
+        .user-chip strong { color: var(--primary); }
+        .btn {
+            padding: .55rem 1rem;
+            border: none;
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: .875rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-danger { background: rgba(244,63,94,.15); color: var(--error); border: 1px solid rgba(244,63,94,.3); }
+        .btn-sm { padding: .4rem .75rem; font-size: .8rem; }
+        main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+        .nav-tabs {
+            display: flex;
+            gap: .5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .nav-tabs button {
+            padding: .6rem 1.1rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .nav-tabs button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .course-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: border-color .2s, transform .2s;
+        }
+        .course-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .course-card h3 { font-size: 1rem; margin-bottom: .35rem; }
+        .course-card .meta { color: var(--muted); font-size: .85rem; margin-bottom: 1rem; }
+        .course-card .actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+        .empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border);
+        }
+        .login-wall {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        .login-wall h2 { margin-bottom: .5rem; }
+        .login-wall p { color: var(--muted); margin-bottom: 1.5rem; }
+        .login-wall a {
+            display: inline-block;
+            padding: .85rem 1.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        th, td { padding: .85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: var(--surface-2); color: var(--muted); font-size: .75rem; text-transform: uppercase; }
+        tr:last-child td { border-bottom: none; }
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            max-width: 480px;
+        }
+        .form-card label {
+            display: block;
+            font-size: .8rem;
+            color: var(--muted);
+            margin: .75rem 0 .3rem;
+        }
+        .form-card label:first-child { margin-top: 0; }
+        .form-card input {
+            width: 100%;
+            padding: .65rem .85rem;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: inherit;
+        }
+        .form-row { display: flex; gap: .5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: .85rem 1.25rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            z-index: 200;
+            transform: translateY(120%);
+            opacity: 0;
+            transition: all .3s;
+            max-width: 360px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.ok { background: var(--primary); color: white; }
+        .toast.err { background: var(--error); color: white; }
+        .badge-admin {
+            background: rgba(245,158,11,.15);
+            color: var(--warn);
+            font-size: .7rem;
+            padding: .15rem .5rem;
+            border-radius: 6px;
+            margin-left: .5rem;
+        }
+        .loading-screen {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+        }
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <h1>Microsserviço Acadêmico</h1>
-    <p class="hint">View MVC — faça login em <a href="http://localhost:8081">:8081</a> e cole o JWT abaixo.</p>
+    <header>
+        <section class="brand">
+            <span class="brand-icon">📚</span>
+            <section>
+                <h1>EduConnect</h1>
+                <span>Cursos e matrículas online</span>
+            </section>
+        </section>
+        <section class="user-bar" id="userBar" style="display:none">
+            <span class="user-chip">Olá, <strong id="userName">—</strong><span id="adminBadge" class="badge-admin" style="display:none">Admin</span></span>
+            <button class="btn btn-ghost" onclick="sair()">Sair</button>
+        </section>
+    </header>
 
-    <label>JWT (Bearer)
-        <input id="jwt" placeholder="cole o token aqui">
-    </label>
+    <main id="mainContent">
+        <section id="loginWall" class="login-wall">
+            <h2>Você não está autenticado</h2>
+            <p>Faça login no serviço de autenticação para acessar cursos e matrículas.</p>
+            <a href="http://127.0.0.1:8081" id="linkAuth">Ir para login →</a>
+        </section>
 
-    <h2>Cursos</h2>
-    <button onclick="listarCursos()">GET /cursos</button>
+        <section id="appContent" style="display:none">
+            <nav class="nav-tabs">
+                <button type="button" class="active" data-panel="cursos">Cursos disponíveis</button>
+                <button type="button" data-panel="matriculas">Minhas matrículas</button>
+                <button type="button" data-panel="admin" id="tabAdmin" style="display:none">Administrar cursos</button>
+            </nav>
 
-    <h2>Matrícula</h2>
-    <label>ID do curso <input id="idCurso" type="number" value="1"></label>
-    <button onclick="matricular()">POST /matriculas</button>
-    <button onclick="listarMatriculas()">GET /matriculas</button>
+            <section id="cursos" class="panel active">
+                <h2 class="section-title">Cursos <button class="btn btn-ghost btn-sm" onclick="carregarCursos()">Atualizar</button></h2>
+                <section id="cursosGrid" class="grid"><p class="loading-screen">Carregando cursos...</p></section>
+            </section>
 
-    <h3>Resposta</h3>
-    <pre id="saida">Aguardando ação...</pre>
+            <section id="matriculas" class="panel">
+                <h2 class="section-title">Minhas matrículas <button class="btn btn-ghost btn-sm" onclick="carregarMatriculas()">Atualizar</button></h2>
+                <section id="matriculasLista"></section>
+            </section>
+
+            <section id="admin" class="panel">
+                <h2 class="section-title">Gestão de cursos</h2>
+                <form class="form-card" id="formCurso" onsubmit="salvarCurso(event)">
+                    <input type="hidden" id="cursoEditId" value="">
+                    <label>Nome do curso</label>
+                    <input id="cursoNome" required placeholder="Ex: Inteligência Artificial">
+                    <label>Carga horária</label>
+                    <input id="cursoCarga" type="number" min="1" required placeholder="60">
+                    <section class="form-row">
+                        <button type="submit" class="btn btn-primary" id="btnSalvarCurso">Cadastrar curso</button>
+                        <button type="button" class="btn btn-ghost" onclick="limparFormCurso()">Limpar</button>
+                    </section>
+                </form>
+                <table>
+                    <thead><tr><th>ID</th><th>Nome</th><th>CH</th><th>Ações</th></tr></thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+            </section>
+        </section>
+    </main>
+
+    <aside id="toast" class="toast"></aside>
 
     <script>
-        const AUTH_URL = 'http://localhost:8081';
+        const AUTH_URL = 'http://127.0.0.1:8081';
+        let cursosCache = [];
 
-        function headersComJwt() {
-            let token = document.getElementById('jwt').value.trim();
-            if (!token) token = localStorage.getItem('jwt') || '';
-            if (!token) throw new Error('Informe o JWT (login no serviço de autenticação)');
+        document.querySelectorAll('.nav-tabs button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.panel).classList.add('active');
+                if (btn.dataset.panel === 'matriculas') carregarMatriculas();
+                if (btn.dataset.panel === 'admin') carregarAdminTable();
+            });
+        });
+
+        function toast(msg, ok = true) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show ' + (ok ? 'ok' : 'err');
+            setTimeout(() => el.classList.remove('show'), 3500);
+        }
+
+        function getToken() {
+            return localStorage.getItem('jwt') || '';
+        }
+
+        function parseJwt(token) {
+            try {
+                const base = token.split('.')[1];
+                return JSON.parse(atob(base.replace(/-/g, '+').replace(/_/g, '/')));
+            } catch { return {}; }
+        }
+
+        function authHeaders() {
+            const token = getToken();
+            if (!token) throw new Error('Sem token');
             return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
         }
 
-        async function listarCursos() {
-            const res = await fetch('/cursos');
-            document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+        function sair() {
+            localStorage.removeItem('jwt');
+            localStorage.removeItem('login');
+            location.reload();
         }
 
-        async function matricular() {
+        function capturarSessaoDaUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const login = params.get('login');
+            if (token) {
+                localStorage.setItem('jwt', token);
+                if (login) localStorage.setItem('login', login);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        function initApp() {
+            capturarSessaoDaUrl();
+            const token = getToken();
+            if (!token) return;
+
+            const claims = parseJwt(token);
+            const login = localStorage.getItem('login') || claims.login || 'Usuário';
+            document.getElementById('loginWall').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+            document.getElementById('userBar').style.display = 'flex';
+            document.getElementById('userName').textContent = claims.nome || login;
+
+            if (login === 'admin') {
+                document.getElementById('tabAdmin').style.display = 'inline-block';
+                document.getElementById('adminBadge').style.display = 'inline';
+            }
+
+            carregarCursos();
+        }
+
+        async function carregarCursos() {
+            const grid = document.getElementById('cursosGrid');
+            grid.innerHTML = '<p class="loading-screen">Carregando...</p>';
+            try {
+                const res = await fetch('/cursos');
+                if (!res.ok) throw new Error('Falha ao listar');
+                cursosCache = await res.json();
+                if (!cursosCache.length) {
+                    grid.innerHTML = '<p class="empty">Nenhum curso cadastrado.</p>';
+                    return;
+                }
+                grid.innerHTML = cursosCache.map(c => `
+                    <article class="course-card">
+                        <h3>${esc(c.nome)}</h3>
+                        <p class="meta">${c.cargaHoraria} horas · ID ${c.id}</p>
+                        <section class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="matricular(${c.id})">Matricular-se</button>
+                        </section>
+                    </article>
+                `).join('');
+            } catch {
+                grid.innerHTML = '<p class="empty">Erro ao carregar. Verifique se o serviço está no ar.</p>';
+            }
+        }
+
+        async function matricular(idCurso) {
             try {
                 const res = await fetch('/matriculas', {
                     method: 'POST',
-                    headers: headersComJwt(),
-                    body: JSON.stringify({ idCurso: Number(document.getElementById('idCurso').value) })
+                    headers: authHeaders(),
+                    body: JSON.stringify({ idCurso })
                 });
-                document.getElementById('saida').textContent = res.status + '\n' + await res.text();
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    toast(data.erro || 'Não foi possível matricular', false);
+                    return;
+                }
+                toast('Matrícula realizada em ' + (data.nomeCurso || 'curso') + '!');
             } catch (e) {
-                document.getElementById('saida').textContent = e.message;
+                toast(e.message === 'Sem token' ? 'Faça login novamente' : 'Erro na matrícula', false);
             }
         }
 
-        async function listarMatriculas() {
+        async function carregarMatriculas() {
+            const el = document.getElementById('matriculasLista');
+            el.innerHTML = '<p class="loading-screen">Carregando...</p>';
             try {
-                const res = await fetch('/matriculas', { headers: headersComJwt() });
-                document.getElementById('saida').textContent = res.status + '\n' + await res.text();
-            } catch (e) {
-                document.getElementById('saida').textContent = e.message;
+                const res = await fetch('/matriculas', { headers: authHeaders() });
+                if (!res.ok) throw new Error();
+                const lista = await res.json();
+                if (!lista.length) {
+                    el.innerHTML = '<p class="empty">Você ainda não está matriculado em nenhum curso.</p>';
+                    return;
+                }
+                el.innerHTML = `<table>
+                    <thead><tr><th>Curso</th><th>Data</th><th>ID</th></tr></thead>
+                    <tbody>${lista.map(m => `
+                        <tr>
+                            <td>${esc(m.nomeCurso)}</td>
+                            <td>${m.data}</td>
+                            <td>#${m.id}</td>
+                        </tr>
+                    `).join('')}</tbody>
+                </table>`;
+            } catch {
+                el.innerHTML = '<p class="empty">Erro ao carregar matrículas.</p>';
             }
         }
 
-        window.addEventListener('load', () => {
-            const saved = localStorage.getItem('jwt');
-            if (saved) document.getElementById('jwt').value = saved;
-        });
+        async function carregarAdminTable() {
+            await carregarCursos();
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = cursosCache.map(c => `
+                <tr>
+                    <td>${c.id}</td>
+                    <td>${esc(c.nome)}</td>
+                    <td>${c.cargaHoraria}h</td>
+                    <td>
+                        <button class="btn btn-ghost btn-sm" onclick="editarCurso(${c.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirCurso(${c.id})">Excluir</button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="4">Nenhum curso</td></tr>';
+        }
+
+        function editarCurso(id) {
+            const c = cursosCache.find(x => x.id === id);
+            if (!c) return;
+            document.getElementById('cursoEditId').value = id;
+            document.getElementById('cursoNome').value = c.nome;
+            document.getElementById('cursoCarga').value = c.cargaHoraria;
+            document.getElementById('btnSalvarCurso').textContent = 'Salvar alterações';
+        }
+
+        function limparFormCurso() {
+            document.getElementById('formCurso').reset();
+            document.getElementById('cursoEditId').value = '';
+            document.getElementById('btnSalvarCurso').textContent = 'Cadastrar curso';
+        }
+
+        async function salvarCurso(e) {
+            e.preventDefault();
+            const id = document.getElementById('cursoEditId').value;
+            const body = {
+                nome: document.getElementById('cursoNome').value.trim(),
+                cargaHoraria: Number(document.getElementById('cursoCarga').value)
+            };
+            try {
+                const url = id ? `/cursos/${id}` : '/cursos';
+                const method = id ? 'PUT' : 'POST';
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    toast(data.erro || 'Erro ao salvar', false);
+                    return;
+                }
+                toast(id ? 'Curso atualizado!' : 'Curso cadastrado!');
+                limparFormCurso();
+                carregarCursos();
+                carregarAdminTable();
+            } catch {
+                toast('Erro ao salvar curso', false);
+            }
+        }
+
+        async function excluirCurso(id) {
+            if (!confirm('Excluir este curso?')) return;
+            try {
+                const res = await fetch(`/cursos/${id}`, { method: 'DELETE' });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    toast(data.erro || 'Erro ao excluir', false);
+                    return;
+                }
+                toast('Curso removido');
+                carregarCursos();
+                carregarAdminTable();
+            } catch {
+                toast('Erro ao excluir', false);
+            }
+        }
+
+        function esc(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        initApp();
     </script>
 </body>
 </html>
