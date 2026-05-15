@@ -17,6 +17,13 @@ Terminal 2:
   cd microservico-academico
   mvn spring-boot:run
 
+BANCOS DE DADOS (PostgreSQL — um por microserviço)
+--------------------------------------------------
+  Auth:      localhost:5432  / banco authdb      (user: aps / senha: aps123)
+  Acadêmico: localhost:5433  / banco academicdb  (user: aps / senha: aps123)
+
+  Os dados persistem em volumes Docker (postgres_auth_data, postgres_academic_data).
+
 EXECUTAR COM DOCKER
 -------------------
   docker compose up --build

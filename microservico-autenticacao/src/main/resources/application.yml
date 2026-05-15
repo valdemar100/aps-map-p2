@@ -5,18 +5,15 @@ spring:
   application:
     name: microservico-autenticacao
   datasource:
-    url: jdbc:h2:mem:authdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://127.0.0.1:5432/authdb}
+    username: ${SPRING_DATASOURCE_USERNAME:aps}
+    password: ${SPRING_DATASOURCE_PASSWORD:aps123}
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 jwt:
   secret: ${JWT_SECRET:aps-map-p2-jwt-secret-key-minimo-32-caracteres}

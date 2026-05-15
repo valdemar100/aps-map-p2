@@ -1,10 +1,50 @@
 services:
+  postgres-auth:
+    image: postgres:16-alpine
+    container_name: aps-postgres-auth
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: aps
+      POSTGRES_PASSWORD: aps123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aps -d authdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  postgres-academic:
+    image: postgres:16-alpine
+    container_name: aps-postgres-academic
+    environment:
+      POSTGRES_DB: academicdb
+      POSTGRES_USER: aps
+      POSTGRES_PASSWORD: aps123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_academic_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aps -d academicdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   autenticacao:
     build: ./microservico-autenticacao
     ports:
       - "8081:8081"
     environment:
       - JWT_SECRET=aps-map-p2-jwt-secret-key-minimo-32-caracteres
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-auth:5432/authdb
+      - SPRING_DATASOURCE_USERNAME=aps
+      - SPRING_DATASOURCE_PASSWORD=aps123
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
 
   academico:
     build: ./microservico-academico
@@ -13,5 +53,15 @@ services:
     environment:
       - JWT_SECRET=aps-map-p2-jwt-secret-key-minimo-32-caracteres
       - AUTH_SERVICE_URL=http://autenticacao:8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-academic:5432/academicdb
+      - SPRING_DATASOURCE_USERNAME=aps
+      - SPRING_DATASOURCE_PASSWORD=aps123
     depends_on:
-      - autenticacao
+      postgres-academic:
+        condition: service_healthy
+      autenticacao:
+        condition: service_started
+
+volumes:
+  postgres_auth_data:
+  postgres_academic_data:
