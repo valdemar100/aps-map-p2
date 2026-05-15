@@ -3,9 +3,11 @@ package com.aps.auth.config;
 import com.aps.auth.dto.CadastroRequest;
 import com.aps.auth.service.UsuarioService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
 
     private final UsuarioService usuarioService;
